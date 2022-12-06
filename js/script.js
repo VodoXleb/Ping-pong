@@ -19,7 +19,8 @@ var RACKET = {
     y: 450,
     width: 100,
     height: 20,
-    speed: 5
+    speed: 5,
+    score: 0,
 }
 
 //готовим инструменты
@@ -38,6 +39,7 @@ function drawFrame() {
     drawBackground();
     drawBall(BALL);
     drawRacket(RACKET);
+    drawRacketScore(RACKET);
 }
 
 //функция рисования фона
@@ -77,6 +79,7 @@ function updateBall(ball, racket){
     if (racketTopLineCollision && racketBottomLineCollision && racketLeftLineCollision && racketRightLineCollision)
     {
         ball.yDirection *= -1;
+        racket.score += 1;
     }
     if ((ball.x + ball.size / 2 > GAME.width)| ((ball.x - ball.size / 2) < 0)) {
         ball.xDirection *= -1;
@@ -86,8 +89,14 @@ function updateBall(ball, racket){
 
 //функция отрисовки ракетки
 function drawRacket(racket){
-    canvasContext.fillStyle ="#1E3D59";
+    canvasContext.fillStyle =racket.color;
     canvasContext.fillRect(racket.x, racket.y, racket.width, racket.height);
+}
+
+function drawRacketScore(racket){
+    canvasContext.fillStyle =racket.color;
+    canvasContext.font = "32px Arial";
+    canvasContext.fillText("Score: " + racket.score, 20, 50);
 }
 
 //функция прослушки событий
