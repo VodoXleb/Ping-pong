@@ -7,7 +7,7 @@ var GAME = {
 var BALL = {
     color: "#FF6E40",
     x: 100,
-    y: 80,
+    y: 480,
     size: 20,
     xDirection: 3,
     yDirection: 5,
@@ -22,7 +22,10 @@ var RACKET = {
     speed: 5,
     score: 0,
 }
-
+blockscountx = 5;
+blockscounty = 5;
+var arrBlocks = [] //объявляем массив
+fillBlocksArray(arrBlocks);
 //готовим инструменты
 var canvas = document.getElementById("canvas");
 var canvasWidth = GAME.width;
@@ -40,6 +43,8 @@ function play(){
     drawFrame(); //рисуем мячик
     updateBall(BALL, RACKET); //обновляем позицию мячика
     requestAnimationFrame(play); //просим браузер повторить тоже самое на следующем кадре
+    intersectBlocks(BALL);
+    respawnBlocks();
 }
 
 //функция рисования кадра
@@ -49,6 +54,7 @@ function drawFrame() {
     drawBall(BALL);
     drawRacket(RACKET);
     drawRacketScore(RACKET);
+    drawBlocks();
 }
 
 //функция рисования фона
@@ -77,6 +83,15 @@ function drawRacketScore(racket){
     canvasContext.fillStyle =racket.color;
     canvasContext.font = "32px Arial";
     canvasContext.fillText("Score: " + racket.score, 20, 50);
+}
+
+function drawBlocks(){
+    for(let i = 1; i <= blockscounty; i++){
+        for(let j = 1; j <= blockscountx; j++){
+            canvasContext.fillStyle = arrBlocks[i][j].color;
+            canvasContext.fillRect(arrBlocks[i][j].x,arrBlocks[i][j].y, arrBlocks[i][j].width, arrBlocks[i][j].height);
+        }
+    }
 }
 
 //пересчёт позиции мячика
@@ -132,5 +147,58 @@ function clampRacketPosition(){
     }
 }
 
+function fillBlocksArray(arrName){
+    let xpos = 30;
+    let ypos = 70;
+    for (let i = 1; i <= blockscounty; i++){
+        arrName[i] = []
+        for (let j = 1; j <= blockscountx; j++){
+            arrName[i][j] = {
+                x:xpos + 0,
+                y:ypos + 0,
+                width:80,
+                height:20,
+                color: "RED",
+            }
+            xpos = xpos + 90;
+        }
+        ypos = ypos + 30;
+        xpos = 30;
+    }
+}
 
+function intersectBlocks(ball){
+    for (let i = 1; i <= blockscounty; i++){
+        for (let j = 1; j <= blockscountx; j++){
+            var ballblockbtmcol = ball.y - ball.size / 2 <= arrBlocks[i][j].y + arrBlocks[i][j].height;
+            var ballblocktopcol = ball.y + ball.size / 2 >= arrBlocks[i][j].y - arrBlocks[i][j].height;
+            var ballblockleftcol = ball.x + ball.size / 2 >= arrBlocks[i][j].x;
+            var ballblockrightcol = ball.x - ball.size / 2 <= arrBlocks[i][j].x + arrBlocks[i][j].width;
+            if (ballblockbtmcol & ballblocktopcol & ballblockleftcol & ballblockrightcol){
+                ball.yDirection *= -1;
+                ball.xDirection *= -1;
+                arrBlocks[i][j].x = -1000;
+                arrBlocks[i][j].y = -1000;
+                arrBlocks[i][j].width = 0;
+                arrBlocks[i][j].height = 0;
+                RACKET.score = RACKET.score + 10;
+                //ANIMATION.explosion = true;
+            }
+        }
+    }
+}
+
+function respawnBlocks(){
+    let checkBlocks = 0;
+    for (let i = 1; i <= blockscounty; i++){
+        for (let j = 1; j <= blockscountx; j++){
+            if (arrBlocks[i][j].width == 0){
+                checkBlocks += 1;
+            }
+        }
+    }
+    if (checkBlocks == blockscounty * blockscountx){
+        fillBlocksArray(arrBlocks);
+    }
+}
 
