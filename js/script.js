@@ -32,6 +32,15 @@ canvas.height = canvasHeight;
 var canvasContext = canvas.getContext("2d");
 canvasContext.fillStyle= "#F5F0E1";
 canvasContext.fillRect(0,0,canvasWidth,canvasHeight);
+initEventsListeners();
+play(); //вызываем функцию перелистывания кадров
+
+//Функция перелистывания кадров
+function play(){
+    drawFrame(); //рисуем мячик
+    updateBall(BALL, RACKET); //обновляем позицию мячика
+    requestAnimationFrame(play); //просим браузер повторить тоже самое на следующем кадре
+}
 
 //функция рисования кадра
 function drawFrame() {
@@ -48,14 +57,6 @@ function drawBackground() {
     canvasContext.fillRect(0,0, GAME.width,GAME.height);
 }
 
-//Функция перелистывания кадров
-function play(){
-    drawFrame(); //рисуем мячик
-    updateBall(BALL, RACKET); //обновляем позицию мячика
-    requestAnimationFrame(play); //просим браузер повторить тоже самое на следующем кадре
-}
-
-//Создание мячика
 //функция рисования мяча
 function drawBall(ball) {
     canvasContext.fillStyle = ball.color;
@@ -63,6 +64,19 @@ function drawBall(ball) {
     canvasContext.arc(ball.x, ball.y, ball.size / 2, 0, 2 * Math.PI);
     canvasContext.fill();
     canvasContext.closePath();
+}
+
+//функция отрисовки ракетки
+function drawRacket(racket){
+    canvasContext.fillStyle =racket.color;
+    canvasContext.fillRect(racket.x, racket.y, racket.width, racket.height);
+}
+
+//функция отрисовки счёта
+function drawRacketScore(racket){
+    canvasContext.fillStyle =racket.color;
+    canvasContext.font = "32px Arial";
+    canvasContext.fillText("Score: " + racket.score, 20, 50);
 }
 
 //пересчёт позиции мячика
@@ -84,19 +98,6 @@ function updateBall(ball, racket){
     if ((ball.x + ball.size / 2 > GAME.width)| ((ball.x - ball.size / 2) < 0)) {
         ball.xDirection *= -1;
     }
-}
-
-
-//функция отрисовки ракетки
-function drawRacket(racket){
-    canvasContext.fillStyle =racket.color;
-    canvasContext.fillRect(racket.x, racket.y, racket.width, racket.height);
-}
-
-function drawRacketScore(racket){
-    canvasContext.fillStyle =racket.color;
-    canvasContext.font = "32px Arial";
-    canvasContext.fillText("Score: " + racket.score, 20, 50);
 }
 
 //функция прослушки событий
@@ -130,9 +131,6 @@ function clampRacketPosition(){
         RACKET.x = 0;
     }
 }
-
-initEventsListeners();
-play(); //вызываем функцию перелистывания кадров
 
 
 
